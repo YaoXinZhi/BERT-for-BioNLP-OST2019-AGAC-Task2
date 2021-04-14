@@ -67,11 +67,11 @@ You can modify the model hyperparameters by editing the config.py file.
 
 
 ### Data
-AGAC_answer.rar and AGAC_training.rar contain the original AGAC-Json files.  
-The label.txt file contains three types of relationship labels, CauseOf, ThemeOf and NoRelation.  
-train_relations.txt and test_relations.txt contain files for the corresponding statistics of the label-relationship in the training set and the test set, which are used to construct negative samples.  
-The train.txt and test.txt files contain all the artificially annotated relationships and the constructed negative samples.
-Please ignore the train.small.txt and test.small.txt files, I use these two files for debugging.  
+**AGAC_answer.rar** and **AGAC_training.rar** contain the original AGAC-Json files.  
+The **labels.txt** file contains three types of relationship labels, CauseOf, ThemeOf and NoRelation.  
+**train_relations.txt** and **test_relations.txt** contain files for the corresponding statistics of the label-relationship in the training set and the test set, which are used to construct negative samples.  
+The **train.txt** and **test.txt** files contain all the artificially annotated relationships and the constructed negative samples.
+Please ignore the **train.small.txt** and **test.small.txt** files, I use these two files for debugging.  
 ```
 data/AGAC_answer.rar
 data/AGAC_training.rar

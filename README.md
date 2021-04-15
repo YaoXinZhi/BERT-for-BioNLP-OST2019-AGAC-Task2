@@ -89,7 +89,7 @@ The current model uses sklearn to calculate accuracy, macro-precision, macro-rec
 **Best Model: (On test set)**   
  **Model** | **Accuracy**  | **Precision** | **Recall**    | **F1-score**
  ---- | ----- | ------  | ------    | ------ 
- **BioBERT-Fc+token label (Only Task2)**  | **0.8590** | **0.8510**| **0.8810**| **0.8592**
+ **BioBERT-Fc+token label (Only Task2-Unfair comparison)**  | **0.8590** | **0.8510**| **0.8810**| **0.8592**
 
 ## OnGoing
 

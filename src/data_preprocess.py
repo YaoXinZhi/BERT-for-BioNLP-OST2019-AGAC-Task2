@@ -38,11 +38,24 @@ def denotation_sent_map(id_to_denotation: dict, sent_to_offset: dict):
     for d_id, (token, label, (t_begin, t_end)) in id_to_denotation.items():
         for sent, (s_begin, s_end) in sent_to_offset.items():
 
-
             if t_begin >= s_begin:
                 if t_end <= s_end:
-                    offset = (t_begin-s_begin, (t_begin-s_begin)+len(token))
+
+                    t_begin -= s_begin
+                    t_end = t_begin + len(token)
+
+                    offset = (t_begin, t_end)
+                    if sent[t_begin: t_end] != token:
+                        if sent.count(token) == 1:
+                            offset = (sent.find(token), sent.find(token)+len(token))
+                        else:
+                            print(sent)
+                            print(t_begin, t_end)
+                            print(sent.find(token), sent.find(token)+len(token))
+                            print(token, sent[t_begin: t_end])
+
                     denotation_to_sent[d_id] = (sent, offset)
+
                     break
                 else:
                     pass
@@ -128,6 +141,16 @@ def json_to_text(json_file: str, pair_to_count: dict):
 
     denotation_to_sent = denotation_sent_map(id_to_denotation, sent_to_offset)
 
+    for t_id, (sentence, (t_start, t_end)) in denotation_to_sent.items():
+        token = id_to_denotation[t_id][0]
+        token_in_sent = sentence[t_start: t_end]
+        if token != token_in_sent:
+            print(json_file)
+            print(t_id)
+            print(sentence)
+            print((t_start, t_end))
+            print(token, token_in_sent)
+
     pos_data_list = []
     sent_to_label_pair = defaultdict(set)
     for relation_dist in relation_list:
@@ -136,11 +159,11 @@ def json_to_text(json_file: str, pair_to_count: dict):
         subj = relation_dist['subj']
         obj = relation_dist['obj']
 
-        subj_token, subj_label, subj_offset = id_to_denotation[subj]
-        subj_sent = denotation_to_sent[subj][0]
+        subj_token, subj_label, _ = id_to_denotation[subj]
+        subj_sent, subj_offset = denotation_to_sent[subj]
 
-        obj_token, obj_label, obj_offset = id_to_denotation[obj]
-        obj_sent = denotation_to_sent[obj][0]
+        obj_token, obj_label, _ = id_to_denotation[obj]
+        obj_sent, obj_offset = denotation_to_sent[obj]
 
         # delete the relation denotation if two token do not in the save sentence.
         if subj_sent != obj_sent:
@@ -149,6 +172,7 @@ def json_to_text(json_file: str, pair_to_count: dict):
         pos_data_list.append(list(map(str, [subj_token, subj_label, subj_offset,
                                             obj_token, obj_label, obj_offset,
                                             pred, subj_sent])))
+
 
         sent_to_label_pair[subj_sent].add((subj, obj))
 
@@ -170,8 +194,8 @@ def read_relation_statistics(relation_statistics_file: str):
     return pair_to_count
 
 
-
-def batch_json_to_text(json_file_path: str, save_file: str, train_relation_statistics: str):
+def batch_json_to_text(json_file_path: str, save_file: str,
+                       train_relation_statistics: str, save_normal_sample=True):
 
 
     pos_data_count = 0
@@ -189,7 +213,7 @@ def batch_json_to_text(json_file_path: str, save_file: str, train_relation_stati
              'Relation\tSentence\n')
     for file_name in json_file_list:
         json_file = os.path.join(json_file_path, file_name)
-
+        # break
         pos_data_list, neg_data_list, normal_neg = json_to_text(json_file, label_pair_to_count)
         for data in normal_neg:
             normal_neg_data_list.append(data)
@@ -207,29 +231,28 @@ def batch_json_to_text(json_file_path: str, save_file: str, train_relation_stati
             write_line = '\t'.join(list(map(str, neg_data)))
             wf.write(f'{write_line}\n')
 
-
-    normal_neg_data_list = normal_neg_data_list[:pos_data_count - hard_neg_data_count]
-    # print(len(normal_neg_data_list),
-    #       pos_data_count-hard_neg_data_count
-    #       ,pos_data_count, hard_neg_data_count)
-    # for data in normal_neg_data_list:
-    #     write_line = '\t'.join(list(map(str, data)))
-    #     wf.write(f'{write_line}\n')
-    #     normal_neg_data_count += 1
+    if save_normal_sample:
+        normal_neg_data_list = normal_neg_data_list[:pos_data_count - hard_neg_data_count]
+        # print(len(normal_neg_data_list),
+        #       pos_data_count-hard_neg_data_count
+        #       ,pos_data_count, hard_neg_data_count)
+        for data in normal_neg_data_list:
+            write_line = '\t'.join(list(map(str, data)))
+            wf.write(f'{write_line}\n')
+            normal_neg_data_count += 1
 
 
     # print(write_pair_to_neg)
     print(f'Positive data: {pos_data_count:,}, Negative(NoRelation) data: {hard_neg_data_count + normal_neg_data_count:,}'
           f'(Hard: {hard_neg_data_count:,},'
           f' Normal: {normal_neg_data_count:,}).')
-
+    print(f'{save_file} save done.')
     wf.close()
 
 
 
 if __name__ == '__main__':
-    # todo: delete
-    from src.config import config
+    # from src.config import config
 
     args = config()
 
@@ -244,7 +267,8 @@ if __name__ == '__main__':
 
     print('Train data:')
     write_pair_to_neg = defaultdict(int)
-    batch_json_to_text(args.train_json_path, args.train_file, args.train_relation_statistics)
+    batch_json_to_text(args.train_json_path, args.train_file,
+                       args.train_relation_statistics)
 
     print('Test data:')
     write_pair_to_neg = defaultdict(int)

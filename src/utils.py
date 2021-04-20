@@ -23,5 +23,10 @@ def loss_to_int(loss):
 def tensor_to_list(tensor):
     return tensor.numpy().tolist()
 
+def input_ids_to_token(tokenizer, input_ids):
+
+    token_list = [''.join(tokenizer.decode(idx).split()) for idx in input_ids]
+    return token_list
+
 
 

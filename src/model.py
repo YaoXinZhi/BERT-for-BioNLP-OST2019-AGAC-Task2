@@ -27,15 +27,10 @@ class BertClassifier(nn.Module):
 
         bert_output = self.bert(**encoded_input)
 
-        # batch_size, embedding_size
         cls_state = bert_output['last_hidden_state'][:, 0, :]
 
-        # batch_size, embedding_size
-        # dropout_layer = nn.Dropout(paras.dropout_prob)
         predicted = self.dropout(cls_state)
 
-        # batch_size, label_number
-        # fc_layer = nn.Linear(paras.hidden_size, paras.num_tags)
         predicted = self.fc(predicted)
         if labels is not None:
             loss = self.CrossEntropyLoss(predicted, labels)

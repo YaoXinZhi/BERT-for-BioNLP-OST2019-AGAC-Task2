@@ -71,7 +71,7 @@ def main(paras):
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                             datefmt='%m/%d/%Y %H:%M:%S',
                             level=paras.logging_level,
-                            filename=f'{paras.log_save_path}/{paras.log_file}',
+                            filename=f'{paras.log_save_path}/{paras.train_log_file}',
                             filemode='w')
     else:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -84,10 +84,16 @@ def main(paras):
     tokenizer = BertTokenizer.from_pretrained(paras.model_name)
     bert = BertModel.from_pretrained(paras.model_name)
 
+
     train_dataset = RE_Dataset(paras, 'train')
     train_dataloaer = DataLoader(train_dataset, batch_size=paras.batch_size,
                                  shuffle=paras.shuffle, drop_last=paras.drop_last)
     label_to_index = train_dataset.label_to_index
+    special_token_list = list(train_dataset.special_token_set)
+    # fixme: add special token to tokenizer
+    special_tokens_dict = {'additional_special_tokens': special_token_list}
+    tokenizer.add_special_tokens(special_tokens_dict)
+    # bert.resize_token_embeddings(len(tokenizer))
 
     test_dataset = RE_Dataset(paras, 'test')
     test_dataloader = DataLoader(test_dataset, batch_size=paras.batch_size,
@@ -167,7 +173,7 @@ def main(paras):
             best_eval['f1'] = f1
             torch.save(bert_classifier, f'{paras.log_save_path}/{paras.model_save_name}')
 
-            with open(f'{paras.log_save_path}/checkpoint.log', 'w') as wf:
+            with open(f'{paras.log_save_path}/{paras.checkpoint_file}', 'w') as wf:
                 wf.write(f'Save time: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}\n')
                 wf.write(f'Best F1-score: {best_eval["f1"]:.4f}\n')
                 wf.write(f'Precision: {best_eval["precision"]:.4f}\n')

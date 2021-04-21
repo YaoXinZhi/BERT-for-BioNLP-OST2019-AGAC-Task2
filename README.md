@@ -95,7 +95,7 @@ The current model uses sklearn to calculate accuracy, macro-precision, macro-rec
  **Model** | **Accuracy**  | **Precision** | **Recall**    | **F1-score**
  ---- | ----- | ------  | ------    | ------ 
  **BioBERT-Fc+token label (Only Task2-Unfair comparison)**  | **0.8590** | **0.8510**| **0.8810**| **0.8592**
- **BioBERT-Fc+Span token (Only Task2-Unfair comparison)**  | **0.9079** | **0.8924**| **0.9057**| **0.8986**
+ **BioBERT-Fc+Span token (Only Task2-Unfair comparison)**  | **0.9186** | **0.9047**| **0.9162**| **0.9101**
 ### Update
 
 **2021-04-29** Add the entity boundary and type as identifiers before and after the entity Span (**Span token**), refer to [Zhong, Zexuan, and Danqi Chen. "A Frustratingly Easy Approach for Joint Entity and Relation Extraction." arXiv preprint arXiv:2010.12812 (2020).](https://arxiv.org/pdf/2010.12812.pdf)

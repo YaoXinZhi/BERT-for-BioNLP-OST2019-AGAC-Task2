@@ -102,7 +102,3 @@ The current model uses sklearn to calculate accuracy, macro-precision, macro-rec
 
 
 
-
-## OnGoing
-
-
